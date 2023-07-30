@@ -6,6 +6,7 @@ import ru.nkashlev.loan_conveyor_app.conveyor.dto.LoanApplicationRequestDTO;
 import ru.nkashlev.loan_conveyor_app.conveyor.dto.LoanOfferDTO;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Service
 public class LoanService {
-    private static long i = 0;
+    private static long id = 0;
     @Value("${baseRate}")
     private double baseRate;
 
@@ -36,11 +37,11 @@ public class LoanService {
                 }
                 // Формируем кредитное предложение
                 LoanOfferDTO offer = new LoanOfferDTO();
-                offer.setApplicationId(++i);
+                offer.setApplicationId(++id);
                 offer.setRequestedAmount(loanApplicationRequest.getAmount());
                 offer.setTotalAmount(loanApplicationRequest.getAmount().add(BigDecimal.valueOf(insurance ? 100000 : 0)));
                 offer.setTerm(loanApplicationRequest.getTerm());
-                offer.setMonthlyPayment(BigDecimal.valueOf(0));
+                offer.setMonthlyPayment(monthlyPayment(rate, loanApplicationRequest.getTerm(), loanApplicationRequest.getAmount().doubleValue()));
                 offer.setRate(BigDecimal.valueOf(rate));
                 offer.setIsInsuranceEnabled(insurance);
                 offer.setIsSalaryClient(salaryClient);
@@ -67,8 +68,17 @@ public class LoanService {
         boolean isPassportSeriesValid = request.getPassportSeries().matches("\\d{4}");
         boolean isPassportNumberValid = request.getPassportNumber().matches("\\d{6}");
 
-        return isAmountValid && isTermValid && isFirstNameValid && isLastNameValid
-                && isMiddleNameValid && isEmailValid && isBirthdateValid
-                && isPassportSeriesValid && isPassportNumberValid;
+        return isAmountValid && isTermValid && isFirstNameValid && isLastNameValid && isMiddleNameValid && isEmailValid
+                && isBirthdateValid && isPassportSeriesValid && isPassportNumberValid;
+    }
+
+    public static BigDecimal monthlyPayment(double rate, int term, double amount) {
+
+
+
+        double monthlyRate = (rate / 12) / 100;
+        double n = Math.pow((1 + monthlyRate), term);
+        BigDecimal bigDecimal = new BigDecimal(String.valueOf(amount * (monthlyRate * n) / (n - 1)));
+        return bigDecimal.setScale(3, RoundingMode.CEILING);
     }
 }

@@ -24,7 +24,7 @@ public class LoanOfferController {
     @ApiOperation("Создать заявку")
     public List<LoanOfferDTO> calculateLoanOffers(@RequestBody LoanApplicationRequestDTO request) {
         // реализация метода расчёта возможных условий кредита
-        if (!loanService.validateRequest(request)) { //!
+        if (!loanService.validateRequest(request)) {
             throw new IllegalArgumentException("Invalid loan application request!");
         }
         return loanService.getLoanOffers(request);
