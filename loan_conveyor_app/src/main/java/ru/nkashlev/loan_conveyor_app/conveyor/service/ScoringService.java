@@ -1,5 +1,7 @@
 package ru.nkashlev.loan_conveyor_app.conveyor.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.nkashlev.loan_conveyor_app.conveyor.dto.CreditDTO;
 import ru.nkashlev.loan_conveyor_app.conveyor.dto.Enum.EmploymentStatus;
@@ -23,6 +25,8 @@ import static ru.nkashlev.loan_conveyor_app.conveyor.service.LoanService.monthly
 @Service
 public class ScoringService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScoringService.class);
+
     public CreditDTO calculate(ScoringDataDTO request) {
         CreditDTO creditDTO = new CreditDTO();
         ScoringService scoringService = new ScoringService();
@@ -32,13 +36,15 @@ public class ScoringService {
         creditDTO.setMonthlyPayment(monthlyPayment);
         creditDTO.setPaymentSchedule(scoringService.calculatePaymentSchedule(request.getAmount(), BigDecimal.valueOf(calculateRate), request.getTerm()));
         creditDTO.setPsk(scoringService.getPSK(monthlyPayment.doubleValue(), request.getTerm()));
+        LOGGER.info("Credit calculated successfully");
         return creditDTO;
     }
 
-    private double getBaseRate(ScoringDataDTO request) {
+    protected double getBaseRate(ScoringDataDTO request) {
         double rate = 10.0;
         // правило 1: рабочий статус
         if (request.getEmployment().getEmploymentStatus() == EmploymentStatus.UNEMPLOYED) {
+            LOGGER.error("Cannot calculate interest rate for unemployed customers");
             throw new ScoringException("Cannot calculate interest rate for unemployed customers");
         } else if (request.getEmployment().getEmploymentStatus() == EmploymentStatus.SELF_EMPLOYED) {
             rate += 1;
@@ -63,6 +69,7 @@ public class ScoringService {
         BigDecimal monthlyIncome = request.getEmployment().getSalary();
         BigDecimal loanAmount = request.getAmount();
         if (loanAmount.compareTo(monthlyIncome.multiply(new BigDecimal("20"))) > 0) {
+            LOGGER.error("Loan amount exceeds 20 times the monthly income");
             throw new ScoringException("Loan amount exceeds 20 times the monthly income");
         }
 
@@ -85,6 +92,7 @@ public class ScoringService {
         // правило 6: возраст
         int age = Period.between(request.getBirthdate(), LocalDate.now()).getYears();
         if (age < 20 || age > 60) {
+            LOGGER.error("Customer age is not within the acceptable range");
             throw new ScoringException("Customer age is not within the acceptable range");
         }
 
@@ -101,12 +109,13 @@ public class ScoringService {
         int monthsOfExperience = request.getEmployment().getWorkExperienceCurrent();
         int monthsOfTotalExperience = request.getEmployment().getWorkExperienceTotal();
         if (monthsOfTotalExperience < 12 || monthsOfExperience < 3) {
-            throw new ScoringException("Customer work experience is not sufficient");
+            LOGGER.error("Work experience is not sufficient");
+            throw new ScoringException("Work experience is not sufficient");
         }
         return rate;
     }
 
-    private List<PaymentScheduleElement> calculatePaymentSchedule(BigDecimal loanAmount, BigDecimal rate, int term) {
+    protected List<PaymentScheduleElement> calculatePaymentSchedule(BigDecimal loanAmount, BigDecimal rate, int term) {
         List<PaymentScheduleElement> paymentSchedule = new ArrayList<>();
         BigDecimal remainingAmount = loanAmount;
         BigDecimal monthlyRate = rate.divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_UP).divide(BigDecimal.valueOf(100));
@@ -126,10 +135,12 @@ public class ScoringService {
 
             paymentSchedule.add(new PaymentScheduleElement(i, nextMonth, loanAmount, interestAmount, principalAmount, remainingAmount));
         }
+        LOGGER.info("Payment schedule calculated successfully");
         return paymentSchedule;
     }
 
-    private BigDecimal getPSK(double monthlyPayment, int term) {
+    protected BigDecimal getPSK(double monthlyPayment, int term) {
+        LOGGER.info("PSK calculated successfully");
         return BigDecimal.valueOf(monthlyPayment * term);
     }
 }

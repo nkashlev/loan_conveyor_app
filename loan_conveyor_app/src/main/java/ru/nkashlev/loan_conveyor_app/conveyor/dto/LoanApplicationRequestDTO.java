@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 // данные о заявке на кредит
-
+@AllArgsConstructor
 @Data
 @Schema(description = "Модель заявки")
 public class LoanApplicationRequestDTO {
