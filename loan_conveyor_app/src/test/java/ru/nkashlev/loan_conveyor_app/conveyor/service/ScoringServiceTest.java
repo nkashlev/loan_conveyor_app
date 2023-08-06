@@ -1,65 +1,68 @@
 package ru.nkashlev.loan_conveyor_app.conveyor.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import ru.nkashlev.loan_conveyor_app.conveyor.dto.CreditDTO;
-import ru.nkashlev.loan_conveyor_app.conveyor.dto.EmploymentDTO;
-import ru.nkashlev.loan_conveyor_app.conveyor.dto.Enum.EmploymentStatus;
-import ru.nkashlev.loan_conveyor_app.conveyor.dto.Enum.MaritalStatus;
-import ru.nkashlev.loan_conveyor_app.conveyor.dto.Enum.Position;
-import ru.nkashlev.loan_conveyor_app.conveyor.dto.PaymentScheduleElement;
-import ru.nkashlev.loan_conveyor_app.conveyor.dto.ScoringDataDTO;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ru.nkashlev.loan_conveyor_app.conveyor.model.CreditDTO;
+import ru.nkashlev.loan_conveyor_app.conveyor.model.PaymentScheduleElement;
+import ru.nkashlev.loan_conveyor_app.conveyor.model.ScoringDataDTO;
+import ru.nkashlev.loan_conveyor_app.conveyor.utils.CalculationLoanUtil;
+import ru.nkashlev.loan_conveyor_app.conveyor.utils.CalculationRateUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.when;
 
-public class ScoringServiceTest {
-
+@ExtendWith(MockitoExtension.class)
+class ScoringServiceTest {
     @Mock
+    private CalculationRateUtil calculationRateUtil;
+    @Mock
+    private CalculationLoanUtil calculationLoanUtil;
+    @InjectMocks
     private ScoringService scoringService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        scoringService = new ScoringService();
-    }
-
-
     @Test
-    public void testCalculate() {
-        ScoringService scoringServiceMock = Mockito.mock(ScoringService.class);
-        Logger loggerMock = Mockito.mock(Logger.class);
-
+    void scoringOffer() {
         ScoringDataDTO request = new ScoringDataDTO();
-        request.setAmount(BigDecimal.valueOf(10000));
-        request.setTerm(12);
-        request.setEmployment(new EmploymentDTO(EmploymentStatus.EMPLOYED, "1234353", BigDecimal.valueOf(50000), Position.MANAGER,24, 12));
-        request.setMaritalStatus(MaritalStatus.MARRIED);
-        request.setDependentAmount(1);
-        request.setBirthdate(LocalDate.of(1996, 10, 21));
+        request.setIsInsuranceEnabled(false);
+        BigDecimal InsuranceEnabledTrue = new BigDecimal("500000");
 
-        double baseRate = 10.0;
-        List<PaymentScheduleElement> paymentSchedule = new ArrayList<>();
-        double psk = 1.0;
+        request.setTerm(18L);
+        BigDecimal rate = new BigDecimal("7");
+        BigDecimal monthlyPayment = new BigDecimal("2355");
+        BigDecimal psk = new BigDecimal("8");
 
-        Mockito.when(scoringServiceMock.getBaseRate(request)).thenReturn(baseRate);
-        Mockito.when(scoringServiceMock.calculatePaymentSchedule(request.getAmount(), BigDecimal.valueOf(baseRate), request.getTerm())).thenReturn(paymentSchedule);
-        Mockito.when(scoringServiceMock.getPSK(Mockito.anyDouble(), Mockito.anyInt())).thenReturn(BigDecimal.valueOf(psk));
+        List<PaymentScheduleElement> list = new ArrayList<>();
+        list.add(new PaymentScheduleElement().
+                number(1).
+                totalPayment(new BigDecimal("425000")).
+                debtPayment(new BigDecimal("26748.94")).
+                interestPayment(new BigDecimal("2500")).
+                remainingDebt(new BigDecimal("380000")).date(LocalDate.of(2023, Month.JANUARY, 18))
+        );
 
-        CreditDTO result = new ScoringService().calculate(request);
+        when(calculationRateUtil.calculateRate(any())).thenReturn(rate);
+        when(calculationLoanUtil.calculateMonthlyPayment(any(), any(), any())).thenReturn(monthlyPayment);
+        when(calculationLoanUtil.calculatePSK(any(), any(), any())).thenReturn(psk);
+        when(calculationLoanUtil.calculatePaymentSchedule(any(), any(), any())).thenReturn(list);
+        when(calculationLoanUtil.calculateAmountIsIsInsuranceEnabled(any())).thenReturn(InsuranceEnabledTrue);
 
-        assertEquals(BigDecimal.valueOf(baseRate), result.getRate());
-        assertNotNull(result.getMonthlyPayment());
-        assertEquals(paymentSchedule, result.getPaymentSchedule());
-        Mockito.verify(loggerMock).info("Credit calculated successfully");
+        CreditDTO creditDTO = scoringService.scoringOffer(request);
+
+        assertEquals(rate, creditDTO.getRate());
+        assertEquals(monthlyPayment, creditDTO.getMonthlyPayment());
+        assertEquals(psk, creditDTO.getPsk());
+        assertEquals(list, creditDTO.getPaymentSchedule());
+        assertEquals(InsuranceEnabledTrue, creditDTO.getAmount());
     }
 }
