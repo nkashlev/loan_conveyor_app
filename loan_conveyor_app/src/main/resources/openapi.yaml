@@ -46,10 +46,7 @@ paths:
           content:
             application/json:
               schema:
-                  type: object
-                  items:
-                    $ref: "#/components/schemas/CreditDTO"
-
+                $ref: "#/components/schemas/CreditDTO"
 
 components:
   schemas:
@@ -74,22 +71,23 @@ components:
           description: Запрашиваемая сумма
         term:
           type: integer
+          format: int64
           example: 12
           minimum: 6
           description: Срок кредита в месяцах
         firstName:
           type: string
-          example: Иван
+          example: Ivan
           pattern: '[A-Za-z]{2,30}'
           description: Имя
         lastName:
           type: string
-          example: Иванов
+          example: Ivanov
           pattern: '[A-Za-z]{2,30}'
           description: Фамилия
         middleName:
           type: string
-          example: Иванович
+          example: Ivanovich
           pattern: '[A-Za-z]{2,30}'
           description: Отчество
         email:
@@ -320,6 +318,7 @@ components:
           description: Сумма кредита
         term:
           type: integer
+          format: int64
           example: 12
           description: Срок кредита в месяцах
         monthlyPayment:
@@ -350,6 +349,7 @@ components:
         properties:
           number:
             type: integer
+            format: int64
             description: Номер платежа
           date:
             type: string
@@ -368,6 +368,3 @@ components:
             type: number
             description: Оставшаяся задолженность по кредиту после платежа
 
-
-
-      #todo

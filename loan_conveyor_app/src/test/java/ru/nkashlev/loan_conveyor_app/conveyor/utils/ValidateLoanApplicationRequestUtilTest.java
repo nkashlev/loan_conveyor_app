@@ -20,7 +20,7 @@ class ValidateLoanApplicationRequestUtilTest {
     void validateRequest() {
         LoanApplicationRequestDTO request = new LoanApplicationRequestDTO();
         request.setAmount(new BigDecimal("400000"));
-        request.setTerm(12);
+        request.setTerm(12L);
         request.setFirstName("John");
         request.setLastName("Doe");
         request.setEmail("johndoe@example.com");

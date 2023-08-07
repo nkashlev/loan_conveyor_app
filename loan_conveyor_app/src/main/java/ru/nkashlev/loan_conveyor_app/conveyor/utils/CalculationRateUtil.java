@@ -29,7 +29,7 @@ public class CalculationRateUtil {
             // Уменьшаем ставку на 1 при наличии зарплатного клиента
             baseRate = baseRate.subtract(BigDecimal.ONE);
         }
-        LOGGER.info("Calculating rate - " + baseRate);
+        LOGGER.info("Calculating rate - {}", baseRate);
         return baseRate;
     }
 

@@ -23,7 +23,7 @@ public class ScoringService {
 
     public CreditDTO scoringOffer(ScoringDataDTO request) {
         BigDecimal amount = calculationLoanUtil.calculateAmountIsIsInsuranceEnabled(request);
-        Integer term = Math.toIntExact(request.getTerm());
+        Long term = request.getTerm();
         BigDecimal rate = calculationRateUtil.calculateRate(request);
         BigDecimal monthlyPayment = calculationLoanUtil.calculateMonthlyPayment(amount, term, rate);
         BigDecimal totalPayment = calculationLoanUtil.calculateTotalPayment(monthlyPayment, term);

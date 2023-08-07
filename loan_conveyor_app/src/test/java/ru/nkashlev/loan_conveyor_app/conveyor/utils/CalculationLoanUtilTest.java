@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CalculationLoanUtilTest {
 
@@ -32,7 +32,7 @@ class CalculationLoanUtilTest {
     void testCalculateMonthlyPayment() {
         CalculationLoanUtil util = new CalculationLoanUtil();
         BigDecimal totalAmount = new BigDecimal("110000");
-        Integer term = 12;
+        Long term = 12L;
         BigDecimal rate = new BigDecimal("10");
         BigDecimal expected = new BigDecimal("9733.82");
 
@@ -48,7 +48,7 @@ class CalculationLoanUtilTest {
         CalculationLoanUtil util = new CalculationLoanUtil();
         BigDecimal amount = new BigDecimal("100000");
         BigDecimal rate = new BigDecimal("10");
-        Integer term = 12;
+        Long term = 12L;
         List<PaymentScheduleElement> expected = new ArrayList<>();
         expected.add(new PaymentScheduleElement().number(1).totalPayment(new BigDecimal("116805.84")).debtPayment(new BigDecimal("9733.82")).interestPayment(new BigDecimal("833.33")).remainingDebt(new BigDecimal("90266.18")).date(LocalDate.now().plusMonths(2)));
         expected.add(new PaymentScheduleElement().number(2).totalPayment(new BigDecimal("116805.84")).debtPayment(new BigDecimal("9836.60")).interestPayment(new BigDecimal("730.55")).remainingDebt(new BigDecimal("80429.58")).date(LocalDate.now().plusMonths(3)));
@@ -64,7 +64,7 @@ class CalculationLoanUtilTest {
         CalculationLoanUtil util = new CalculationLoanUtil();
         BigDecimal totalPayment = new BigDecimal("116805.84");
         BigDecimal amount = new BigDecimal("100000");
-        Integer term = 12;
+        Long term = 12L;
         BigDecimal expected = new BigDecimal("17.34");
 
         CalculationLoanUtil mockUtil = Mockito.spy(util);
@@ -78,7 +78,7 @@ class CalculationLoanUtilTest {
     void testCalculateTotalPayment() {
         CalculationLoanUtil util = new CalculationLoanUtil();
         BigDecimal monthlyPayment = new BigDecimal("9733.82");
-        Integer term = 12;
+        Long term = 12L;
         BigDecimal expected = new BigDecimal("116805.84");
 
         CalculationLoanUtil mockUtil = Mockito.spy(util);

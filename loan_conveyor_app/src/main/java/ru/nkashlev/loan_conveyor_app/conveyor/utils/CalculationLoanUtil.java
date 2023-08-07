@@ -27,15 +27,15 @@ public class CalculationLoanUtil {
         return amount.add(overpaymentOnLoan);
     }
 
-    public BigDecimal calculateMonthlyPayment(BigDecimal totalAmount, Integer term, BigDecimal rate) {
+    public BigDecimal calculateMonthlyPayment(BigDecimal totalAmount, Long term, BigDecimal rate) {
         BigDecimal monthlyRate = monthlyRate(rate);
-        BigDecimal temp = BigDecimal.ONE.add(monthlyRate).pow(term);
+        BigDecimal temp = BigDecimal.ONE.add(monthlyRate).pow(Math.toIntExact(term));
         BigDecimal monthlyPayment = totalAmount.multiply(monthlyRate.multiply(temp)).divide(temp.subtract(BigDecimal.ONE), 2, HALF_UP);
         LOGGER.info("Calculating monthly payment");
         return monthlyPayment;
     }
 
-    public List<PaymentScheduleElement> calculatePaymentSchedule(BigDecimal amount, BigDecimal rate, Integer term) {
+    public List<PaymentScheduleElement> calculatePaymentSchedule(BigDecimal amount, BigDecimal rate, Long term) {
         List<PaymentScheduleElement> paymentSchedule = new ArrayList<>();
         BigDecimal remainingDebt = amount;
         BigDecimal monthlyRate = monthlyRate(rate);
@@ -66,13 +66,13 @@ public class CalculationLoanUtil {
         return paymentSchedule;
     }
 
-    public BigDecimal calculatePSK(BigDecimal totalPayment, BigDecimal amount, Integer term) {
+    public BigDecimal calculatePSK(BigDecimal totalPayment, BigDecimal amount, Long term) {
         LOGGER.info("PSK calculated successfully");
         return totalPayment.divide(amount.subtract(new BigDecimal("1")),
                 10, RoundingMode.HALF_UP).divide(new BigDecimal(term), 10, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
     }
 
-    public BigDecimal calculateTotalPayment(BigDecimal monthlyPayment, Integer term) {
+    public BigDecimal calculateTotalPayment(BigDecimal monthlyPayment, Long term) {
         LOGGER.info("Total payment calculated successfully");
         return monthlyPayment.multiply(BigDecimal.valueOf(term));
     }

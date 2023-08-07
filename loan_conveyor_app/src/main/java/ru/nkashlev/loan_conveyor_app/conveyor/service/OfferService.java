@@ -35,7 +35,7 @@ public class OfferService {
         BigDecimal rate = calculationRateUtil.calculateRate(isInsuranceEnabled, isSalaryClient);
         BigDecimal totalAmount = calculationLoanUtil.evaluateTotalAmount(request.getAmount(), rate);
         BigDecimal monthlyPayment = calculationLoanUtil.calculateMonthlyPayment(request.getAmount(), request.getTerm(), rate);
-        LOGGER.info("Create offer № " + id);
+        LOGGER.info("Create offer № {}", id);
         return new LoanOfferDTO().applicationId(id++)
                 .requestedAmount(request.getAmount())
                 .totalAmount(totalAmount)

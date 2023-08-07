@@ -30,7 +30,7 @@ class OfferServiceTest {
         LoanApplicationRequestDTO request = new LoanApplicationRequestDTO();
         BigDecimal amount = new BigDecimal("100000");
         request.setAmount(amount);
-        request.setTerm(18);
+        request.setTerm(18L);
 
         BigDecimal totalAmountIsnFalse = new BigDecimal("100005");
         BigDecimal totalAmountIsnTrue = new BigDecimal("100002");
