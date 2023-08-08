@@ -17,7 +17,7 @@ import static java.math.RoundingMode.HALF_UP;
 
 @Component
 public class CalculationLoanUtil {
-    private static Integer id = 1;
+    private static Long id = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculationLoanUtil.class);
 
     public BigDecimal evaluateTotalAmount(BigDecimal amount, BigDecimal rate) {

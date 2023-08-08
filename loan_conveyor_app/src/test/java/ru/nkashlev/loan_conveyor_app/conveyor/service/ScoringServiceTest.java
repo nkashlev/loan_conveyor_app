@@ -17,9 +17,8 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +43,7 @@ class ScoringServiceTest {
 
         List<PaymentScheduleElement> list = new ArrayList<>();
         list.add(new PaymentScheduleElement().
-                number(1).
+                number(1L).
                 totalPayment(new BigDecimal("425000")).
                 debtPayment(new BigDecimal("26748.94")).
                 interestPayment(new BigDecimal("2500")).

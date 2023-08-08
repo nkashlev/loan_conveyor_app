@@ -14,44 +14,46 @@ import java.time.Period;
 
 @Component
 public class CalculationRateUtil {
-    @Value("${rate}")
-    private BigDecimal rate;
+
+    @Value("${baseRate}")
+    private BigDecimal baseRate;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalculationRateUtil.class);
 
     public BigDecimal calculateRate(Boolean isInsuranceEnabled, Boolean isSalaryClient) {
-        BigDecimal baseRate = rate;
+        BigDecimal rate = baseRate;
+        LOGGER.info("baseRate - {}", rate);
         if (isInsuranceEnabled) {
             // Уменьшаем ставку на 3 при наличии страховки
-            baseRate = baseRate.subtract(new BigDecimal("3"));
+            rate = rate.subtract(new BigDecimal("3"));
         }
         if (isSalaryClient) {
             // Уменьшаем ставку на 1 при наличии зарплатного клиента
-            baseRate = baseRate.subtract(BigDecimal.ONE);
+            rate = rate.subtract(BigDecimal.ONE);
         }
-        LOGGER.info("Calculating rate - {}", baseRate);
-        return baseRate;
+        LOGGER.info("Calculating rate - {}", rate);
+        return rate;
     }
 
     public BigDecimal calculateRate(ScoringDataDTO request) {
-        BigDecimal baseRate = calculateRate(request.isIsInsuranceEnabled(), request.isIsSalaryClient());
+        BigDecimal rate = calculateRate(request.isIsInsuranceEnabled(), request.isIsSalaryClient());
         // правило 1: рабочий статус
         if (request.getEmployment().getEmploymentStatus() == EmploymentDTO.EmploymentStatusEnum.UNEMPLOYED) {
             LOGGER.error("Cannot calculate interest rate for unemployed customers");
             throw new ScoringException("Cannot calculate interest rate for unemployed customers");
         } else if (request.getEmployment().getEmploymentStatus() == EmploymentDTO.EmploymentStatusEnum.SELF_EMPLOYED) {
-            baseRate = baseRate.add(new BigDecimal("1"));
+            rate = rate.add(new BigDecimal("1"));
         } else if (request.getEmployment().getEmploymentStatus() == EmploymentDTO.EmploymentStatusEnum.BUSINESS_OWNER) {
-            baseRate = baseRate.add(new BigDecimal("3"));
+            rate = rate.add(new BigDecimal("3"));
         }
 
         // правило 2: позиция на работе
         if (request.getEmployment().getPosition() == EmploymentDTO.PositionEnum.MANAGER) {
-            baseRate = baseRate.subtract(new BigDecimal("2"));
+            rate = rate.subtract(new BigDecimal("2"));
         } else if (request.getEmployment().getPosition() == EmploymentDTO.PositionEnum.TOP_MANAGER) {
-            baseRate = baseRate.subtract(new BigDecimal("4"));
+            rate = rate.subtract(new BigDecimal("4"));
         } else if (request.getEmployment().getPosition() == EmploymentDTO.PositionEnum.ENGINEER) {
-            baseRate = baseRate.subtract(new BigDecimal("3"));
+            rate = rate.subtract(new BigDecimal("3"));
         }
 
         // правило 3: сумма займа
@@ -64,18 +66,18 @@ public class CalculationRateUtil {
 
         // правило 4: семейное положение
         if (request.getMaritalStatus() == ScoringDataDTO.MaritalStatusEnum.MARRIED) {
-            baseRate = baseRate.subtract(new BigDecimal("3"));
+            rate = rate.subtract(new BigDecimal("3"));
         } else if (request.getMaritalStatus() == ScoringDataDTO.MaritalStatusEnum.DIVORCED) {
-            baseRate = baseRate.add(new BigDecimal("1"));
+            rate = rate.add(new BigDecimal("1"));
         } else if (request.getMaritalStatus() == ScoringDataDTO.MaritalStatusEnum.SINGLE) {
-            baseRate = baseRate.add(new BigDecimal("1"));
+            rate = rate.add(new BigDecimal("1"));
         } else if (request.getMaritalStatus() == ScoringDataDTO.MaritalStatusEnum.WIDOWED) {
-            baseRate = baseRate.subtract(new BigDecimal("1"));
+            rate = rate.subtract(new BigDecimal("1"));
         }
 
         // правило 5: количество иждивенцев
         if (request.getDependentAmount() > 1) {
-            baseRate = baseRate.add(new BigDecimal("1"));
+            rate = rate.add(new BigDecimal("1"));
         }
 
         // правило 6: возраст
@@ -87,11 +89,11 @@ public class CalculationRateUtil {
 
         // правило 7: пол
         if (request.getGender() == ScoringDataDTO.GenderEnum.FEMALE && age >= 35 && age <= 60) {
-            baseRate = baseRate.subtract(new BigDecimal("3"));
+            rate = rate.subtract(new BigDecimal("3"));
         } else if (request.getGender() == ScoringDataDTO.GenderEnum.MALE && age >= 30 && age <= 55) {
-            baseRate = baseRate.subtract(new BigDecimal("3"));
+            rate = rate.subtract(new BigDecimal("3"));
         } else if (request.getGender() == ScoringDataDTO.GenderEnum.NON_BINARY) {
-            baseRate = baseRate.add(new BigDecimal("3"));
+            rate = rate.add(new BigDecimal("3"));
         }
 
         // правило 8: стаж работы
@@ -99,6 +101,6 @@ public class CalculationRateUtil {
             LOGGER.error("Work experience is not sufficient");
             throw new ScoringException("Work experience is not sufficient");
         }
-        return baseRate;
+        return rate;
     }
 }

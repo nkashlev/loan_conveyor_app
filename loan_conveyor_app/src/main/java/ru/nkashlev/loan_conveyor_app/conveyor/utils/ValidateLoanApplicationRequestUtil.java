@@ -6,32 +6,49 @@ import org.springframework.stereotype.Component;
 import ru.nkashlev.loan_conveyor_app.conveyor.model.LoanApplicationRequestDTO;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ValidateLoanApplicationRequestUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateLoanApplicationRequestUtil.class);
-    public boolean validateRequest(LoanApplicationRequestDTO request) {
-        boolean isAmountValid = request.getAmount().intValue() >= 10000;
-        boolean isTermValid = request.getTerm() >= 6;
-        boolean isFirstNameValid = request.getFirstName().matches("[A-Za-z]{2,30}");
-        boolean isLastNameValid = request.getLastName().matches("[A-Za-z]{2,30}");
-        boolean isMiddleNameValid = true; // Отчество не обязательно
 
-        if (request.getMiddleName() != null) {
-            isMiddleNameValid = request.getMiddleName().matches("[A-Za-z]{2,30}");
+    public List<String> validateRequest(LoanApplicationRequestDTO request) {
+        List<String> invalidFields = new ArrayList<>();
+
+        if (request.getAmount().intValue() < 10000) {
+            invalidFields.add("amount");
         }
-        boolean isEmailValid = request.getEmail().matches("[\\w.]{2,50}@[\\w.]{2,20}");
-        boolean isBirthdateValid = request.getBirthdate().isBefore(LocalDate.now().minusYears(18));
-        boolean isPassportSeriesValid = request.getPassportSeries().matches("\\d{4}");
-        boolean isPassportNumberValid = request.getPassportNumber().matches("\\d{6}");
-
-        boolean isValid = isAmountValid && isTermValid && isFirstNameValid && isLastNameValid && isMiddleNameValid && isEmailValid
-                && isBirthdateValid && isPassportSeriesValid && isPassportNumberValid;
-
-        if (!isValid) {
-            LOGGER.error("Invalid loan application request: {}", request);
+        if (request.getTerm() < 6) {
+            invalidFields.add("term");
         }
-        return isValid;
+        if (!request.getFirstName().matches("[A-Za-z]{2,30}")) {
+            invalidFields.add("firstName");
+        }
+        if (!request.getLastName().matches("[A-Za-z]{2,30}")) {
+            invalidFields.add("lastName");
+        }
+        if (request.getMiddleName() != null && !request.getMiddleName().matches("[A-Za-z]{2,30}")) {
+            invalidFields.add("middleName");
+        }
+        if (!request.getEmail().matches("[\\w.]{2,50}@[\\w.]{2,20}")) {
+            invalidFields.add("email");
+        }
+        if (!request.getBirthdate().isBefore(LocalDate.now().minusYears(18))) {
+            invalidFields.add("birthdate");
+        }
+        if (!request.getPassportSeries().matches("\\d{4}")) {
+            invalidFields.add("passportSeries");
+        }
+        if (!request.getPassportNumber().matches("\\d{6}")) {
+            invalidFields.add("passportNumber");
+        }
+
+
+        if (!invalidFields.isEmpty()) {
+            LOGGER.error("Invalid loan application, invalid field(s): {}", invalidFields);
+        }
+        return invalidFields;
     }
 }

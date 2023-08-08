@@ -42,7 +42,6 @@ class CalculationLoanUtilTest {
         BigDecimal result = mockUtil.calculateMonthlyPayment(totalAmount, term, rate);
         assertEquals(expected, result);
     }
-
     @Test
     void testCalculatePaymentSchedule() {
         CalculationLoanUtil util = new CalculationLoanUtil();
@@ -50,8 +49,8 @@ class CalculationLoanUtilTest {
         BigDecimal rate = new BigDecimal("10");
         Long term = 12L;
         List<PaymentScheduleElement> expected = new ArrayList<>();
-        expected.add(new PaymentScheduleElement().number(1).totalPayment(new BigDecimal("116805.84")).debtPayment(new BigDecimal("9733.82")).interestPayment(new BigDecimal("833.33")).remainingDebt(new BigDecimal("90266.18")).date(LocalDate.now().plusMonths(2)));
-        expected.add(new PaymentScheduleElement().number(2).totalPayment(new BigDecimal("116805.84")).debtPayment(new BigDecimal("9836.60")).interestPayment(new BigDecimal("730.55")).remainingDebt(new BigDecimal("80429.58")).date(LocalDate.now().plusMonths(3)));
+        expected.add(new PaymentScheduleElement().number(1L).totalPayment(new BigDecimal("116805.84")).debtPayment(new BigDecimal("9733.82")).interestPayment(new BigDecimal("833.33")).remainingDebt(new BigDecimal("90266.18")).date(LocalDate.now().plusMonths(2)));
+        expected.add(new PaymentScheduleElement().number(2L).totalPayment(new BigDecimal("116805.84")).debtPayment(new BigDecimal("9836.60")).interestPayment(new BigDecimal("730.55")).remainingDebt(new BigDecimal("80429.58")).date(LocalDate.now().plusMonths(3)));
         CalculationLoanUtil mockUtil = Mockito.spy(util);
         Mockito.doReturn(expected).when(mockUtil).calculatePaymentSchedule(amount, rate, term);
 
@@ -87,7 +86,6 @@ class CalculationLoanUtilTest {
         BigDecimal result = mockUtil.calculateTotalPayment(monthlyPayment, term);
         assertEquals(expected, result);
     }
-
     @Test
     void testCalculateAmountIsIsInsuranceEnabled() {
         CalculationLoanUtil util = new CalculationLoanUtil();
@@ -102,4 +100,5 @@ class CalculationLoanUtilTest {
         BigDecimal result = mockUtil.calculateAmountIsIsInsuranceEnabled(request);
         assertEquals(expected, result);
     }
+
 }

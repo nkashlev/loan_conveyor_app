@@ -16,10 +16,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OfferService {
-    private static long id = 1;
+    private static Long id = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(OfferService.class);
-    private final CalculationRateUtil calculationRateUtil;
+
     private final CalculationLoanUtil calculationLoanUtil;
+
+    private final CalculationRateUtil calculateRate;
 
     public List<LoanOfferDTO> generateOffers(LoanApplicationRequestDTO request) {
         LOGGER.info("Generate offers");
@@ -32,7 +34,7 @@ public class OfferService {
     }
 
     private LoanOfferDTO createOffer(Boolean isInsuranceEnabled, Boolean isSalaryClient, LoanApplicationRequestDTO request) {
-        BigDecimal rate = calculationRateUtil.calculateRate(isInsuranceEnabled, isSalaryClient);
+        BigDecimal rate = calculateRate.calculateRate(isInsuranceEnabled, isSalaryClient);
         BigDecimal totalAmount = calculationLoanUtil.evaluateTotalAmount(request.getAmount(), rate);
         BigDecimal monthlyPayment = calculationLoanUtil.calculateMonthlyPayment(request.getAmount(), request.getTerm(), rate);
         LOGGER.info("Create offer № {}", id);

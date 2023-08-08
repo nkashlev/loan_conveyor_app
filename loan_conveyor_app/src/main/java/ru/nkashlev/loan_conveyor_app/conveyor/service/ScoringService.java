@@ -18,8 +18,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScoringService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScoringService.class);
+
     private final CalculationRateUtil calculationRateUtil;
     private final CalculationLoanUtil calculationLoanUtil;
+
 
     public CreditDTO scoringOffer(ScoringDataDTO request) {
         BigDecimal amount = calculationLoanUtil.calculateAmountIsIsInsuranceEnabled(request);
@@ -35,7 +37,7 @@ public class ScoringService {
                 amount(amount).
                 monthlyPayment(monthlyPayment).
                 psk(psk).
-                term(Math.toIntExact(term)).
+                term(term).
                 paymentSchedule(paymentScheduleElements).
                 isInsuranceEnabled(request.isIsInsuranceEnabled()).
                 isSalaryClient(request.isIsSalaryClient());
