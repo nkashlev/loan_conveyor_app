@@ -39,7 +39,7 @@ class OfferServiceTest {
         BigDecimal rateIsnSalaryClient = new BigDecimal("9");
         BigDecimal rateIsnInsuranceEnabled = new BigDecimal("7");
         BigDecimal rateIsnInsuranceEnabledIsnInsuranceEnabled = new BigDecimal("6");
-        Integer term = 18;
+        Long term = 18L;
 
         when(calculationLoanUtil.evaluateTotalAmount(any(), any())).thenReturn(totalAmountIsnFalse, totalAmountIsnFalse,
                 totalAmountIsnTrue, totalAmountIsnTrue);
