@@ -1,7 +1,7 @@
 package ru.nkashlev.loan_conveyor_app.conveyor.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.nkashlev.loan_conveyor_app.conveyor.api.LoanOfferApi;
@@ -21,12 +21,12 @@ public class LoanOfferController implements LoanOfferApi {
 
     private final ValidateLoanApplicationRequestUtil validateRequestService;
 
-    @PostMapping("/offers")
-    public List<LoanOfferDTO> calculateLoanOffers(@RequestBody LoanApplicationRequestDTO request) {
+    @Override
+    public ResponseEntity<List<LoanOfferDTO>> scoringLoanOffers(@RequestBody LoanApplicationRequestDTO request) {
         List<String> validateRequest = validateRequestService.validateRequest(request);
         if (!validateRequest.isEmpty()) {
             throw new ScoringException(validateRequest);
         }
-        return offerService.generateOffers(request);
+        return ResponseEntity.ok(offerService.generateOffers(request));
     }
 }
