@@ -4,6 +4,7 @@ package ru.nkashlev.loan_conveyor_app.conveyor.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.nkashlev.loan_conveyor_app.conveyor.model.LoanApplicationRequestDTO;
 import ru.nkashlev.loan_conveyor_app.conveyor.model.LoanOfferDTO;

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import ru.nkashlev.loan_conveyor_app.conveyor.model.LoanApplicationRequestDTO;
 import ru.nkashlev.loan_conveyor_app.conveyor.model.LoanOfferDTO;
 import ru.nkashlev.loan_conveyor_app.conveyor.utils.CalculationLoanUtil;
